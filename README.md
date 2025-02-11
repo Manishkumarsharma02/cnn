@@ -40,9 +40,6 @@ filters.compile(optimizer='adam',
                metrics=['accuracy'])
 filters.fit(x_train,y_train,epochs=5)
 
-for i in range (0,9):
- plot_sample(x_test,y_test,i)
-
 
 y_pred=filters.predict(x_test)
 y_pred_classes=[np.argmax(element) for element in y_pred]
