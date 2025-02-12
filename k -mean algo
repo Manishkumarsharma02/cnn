@@ -1,0 +1,45 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
+iris = load_iris()#load iris
+data = pd.DataFrame(iris.data, columns=iris.feature_names)
+
+scaler = StandardScaler()
+data_scaled = scaler.fit_transform(data)
+#elbow  method
+inertia = []
+k_values = range(1, 11)
+for k in k_values:
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    kmeans.fit(data_scaled)
+    inertia.append(kmeans.inertia_)
+
+# Plot the Elbow Method
+plt.figure(figsize=(8, 5))
+plt.plot(k_values, inertia, marker='o', linestyle='--')
+plt.xlabel('Number of Clusters (k)')
+plt.ylabel('Inertia')
+plt.title('Elbow Method for Optimal k')
+plt.show()
+# k-mean
+k_optimal = 3
+kmeans = KMeans(n_clusters=k_optimal, random_state=42, n_init=10)
+clusters = kmeans.fit_predict(data_scaled)
+data['Cluster'] = clusters
+silhouette_avg = silhouette_score(data_scaled, clusters)
+print(f'Silhouette Score for k={k_optimal}: {silhouette_avg:.4f}')
+
+# Visualize clusters 
+plt.figure(figsize=(8, 5))
+sns.scatterplot(x=data.iloc[:, 0], y=data.iloc[:, 1], hue=data['Cluster'], palette='viridis')
+plt.xlabel(iris.feature_names[0])
+plt.ylabel(iris.feature_names[1])
+plt.title('K-means Clustering of Iris Dataset')
+plt.legend(title='Cluster')
+plt.show()
